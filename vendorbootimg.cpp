@@ -126,7 +126,7 @@ bool VendorBootBuilder::WriteTableEntries(std::ostream &out) {
     out.write(name.data(), name.size());
 
     // TODO: Support board_id? Useless in most cases tho.
-    for (const auto &id : entry.board_id) {
+    for (const auto &_ : entry.board_id) {
       utils::WriteU32(out, 0);
     }
     offset += size;
