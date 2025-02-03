@@ -116,6 +116,11 @@ ParseArguments(int argc, char *argv[]) {
                 << "\n";
       return false;
     }
+
+    // Fragments require header v4
+    args.header_version = 4;
+    vendor_args.header_version = 4;
+
     vendor_args.ramdisks.push_back(currentEntry);
     currentEntry = VendorRamdiskEntry();
     currentFlags = RamdiskEntryFlags();
