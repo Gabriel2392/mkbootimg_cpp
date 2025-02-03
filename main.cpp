@@ -28,6 +28,73 @@ struct RamdiskEntryFlags {
   bool has_fragment = false;
 };
 
+void print_help() {
+  std::cout
+      << "usage: mkbootimg [-h|--help] [--kernel KERNEL] [--ramdisk RAMDISK] "
+         "[--second SECOND] [--dtb DTB] [--recovery_dtbo RECOVERY_DTBO] "
+         "[--cmdline CMDLINE] [--vendor_cmdline VENDOR_CMDLINE] [--base BASE]\n"
+         "                    [--kernel_offset KERNEL_OFFSET] "
+         "[--ramdisk_offset RAMDISK_OFFSET] [--second_offset SECOND_OFFSET] "
+         "[--dtb_offset DTB_OFFSET] [--os_version OS_VERSION] "
+         "[--os_patch_level OS_PATCH_LEVEL] [--tags_offset TAGS_OFFSET]\n"
+         "                    [--board BOARD] [--pagesize "
+         "{2048,4096,8192,16384}] [--id] [--header_version HEADER_VERSION] "
+         "[-o/--output OUTPUT] [--vendor_boot VENDOR_BOOT] [--vendor_ramdisk "
+         "VENDOR_RAMDISK] [--vendor_bootconfig VENDOR_BOOTCONFIG]\n\n"
+         "options:\n"
+         "  -h, --help            show this help message and exit\n"
+         "  --kernel KERNEL       path to the kernel\n"
+         "  --ramdisk RAMDISK     path to the ramdisk\n"
+         "  --second SECOND       path to the second bootloader\n"
+         "  --dtb DTB             path to the dtb\n"
+         "  --recovery_dtbo RECOVERY_DTBO\n"
+         "                        path to the recovery DTBO\n"
+         "  --cmdline CMDLINE     kernel command line arguments\n"
+         "  --vendor_cmdline VENDOR_CMDLINE\n"
+         "                        vendor boot kernel command line arguments\n"
+         "  --base BASE           base address\n"
+         "  --kernel_offset KERNEL_OFFSET\n"
+         "                        kernel offset\n"
+         "  --ramdisk_offset RAMDISK_OFFSET\n"
+         "                        ramdisk offset\n"
+         "  --second_offset SECOND_OFFSET\n"
+         "                        second bootloader offset\n"
+         "  --dtb_offset DTB_OFFSET\n"
+         "                        dtb offset\n"
+         "  --os_version OS_VERSION\n"
+         "                        operating system version\n"
+         "  --os_patch_level OS_PATCH_LEVEL\n"
+         "                        operating system patch level\n"
+         "  --tags_offset TAGS_OFFSET\n"
+         "                        tags offset\n"
+         "  --board BOARD         board name\n"
+         "  --pagesize {2048,4096,8192,16384}\n"
+         "                        page size\n"
+         "  --header_version HEADER_VERSION\n"
+         "                        boot image header version\n"
+         "  -o, --out, --output, --boot BOOT\n"
+         "                        output file name\n"
+         "  --vendor_boot VENDOR_BOOT   output file name\n"
+         "                        vendor boot output file name\n"
+         "  --vendor_ramdisk VENDOR_RAMDISK\n"
+         "                        path to the vendor ramdisk\n"
+         "  --vendor_bootconfig VENDOR_BOOTCONFIG\n"
+         "                        path to the vendor bootconfig file\n"
+         "\nvendor boot version 4 arguments:\n"
+         "  --ramdisk_type {none,platform,recovery,dlkm}\n"
+         "                        specify the type of the ramdisk\n"
+         "  --ramdisk_name NAME\n"
+         "                        specify the name of the ramdisk\n"
+         "  --vendor_ramdisk_fragment VENDOR_RAMDISK_FILE\n"
+         "                        path to the vendor ramdisk file\n\n"
+         "  These options can be specified multiple times, where each vendor "
+         "ramdisk\n"
+         "  option group ends with a --vendor_ramdisk_fragment option.\n"
+         "  Each option group appends an additional ramdisk to the vendor boot "
+         "image.\n";
+  exit(EXIT_FAILURE);
+}
+
 std::optional<std::pair<BootImageArgs, VendorBootArgs>>
 ParseArguments(int argc, char *argv[]) {
   BootImageArgs args;
@@ -242,12 +309,15 @@ ParseArguments(int argc, char *argv[]) {
       }
       args.header_version = std::strtoul(argv[i], nullptr, 0);
       vendor_args.header_version = args.header_version;
-    } else if (arg == "-o") {
+    } else if (arg == "-o" || arg == "--output" || arg == "--out" ||
+               arg == "--boot") {
       if (++i >= argc) {
-        std::cerr << "-o requires an argument\n";
+        std::cerr << "--output requires an argument\n";
         return std::nullopt;
       }
       args.output = argv[i];
+    } else if (arg == "-h" || arg == "--help") {
+      print_help();
     } else {
       std::cerr << "Unknown argument: " << arg << "\n";
       return std::nullopt;
@@ -283,6 +353,9 @@ ParseArguments(int argc, char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
+  if (argc < 2)
+    print_help();
+
   auto parsed = ParseArguments(argc, argv);
   if (!parsed) {
     std::cerr << "Invalid arguments\n";
