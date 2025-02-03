@@ -301,6 +301,11 @@ ParseArguments(int argc, char *argv[]) {
         return std::nullopt;
       }
       args.page_size = std::strtoul(argv[i], nullptr, 0);
+      bool isPageSizeValid = args.page_size >= 2048 && (args.page_size & (args.page_size - 1)) == 0 && args.page_size <= 16384;
+      if (!isPageSizeValid) {
+        std::cerr << "Invalid page size: " << args.page_size << "\n";
+        return std::nullopt;
+      }
       vendor_args.page_size = args.page_size;
     } else if (arg == "--header_version") {
       if (++i >= argc) {
