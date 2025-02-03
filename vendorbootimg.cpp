@@ -10,6 +10,7 @@ constexpr uint32_t VENDOR_RAMDISK_TABLE_ENTRY_V4_SIZE = 108;
 constexpr uint32_t VENDOR_BOOT_IMAGE_HEADER_V3_SIZE = 2112;
 constexpr uint32_t VENDOR_BOOT_IMAGE_HEADER_V4_SIZE = 2128;
 constexpr uint32_t VENDOR_BOOT_ARGS_SIZE = 2048;
+constexpr uint32_t VENDOR_BOOT_NAME_SIZE = 16;
 } // namespace
 
 bool VendorBootBuilder::Build() {
@@ -75,7 +76,8 @@ bool VendorBootBuilder::WriteHeader(std::ostream &out) {
 
   utils::WriteU32(out, args.base + args.tags_offset);
 
-  std::vector<char> board(16, 0);
+  std::vector<char> board(args.board.begin(), args.board.end());
+  board.resize(VENDOR_BOOT_NAME_SIZE, 0);
   out.write(board.data(), board.size());
 
   const uint32_t header_size = args.header_version > 3 ? VENDOR_BOOT_IMAGE_HEADER_V4_SIZE : VENDOR_BOOT_IMAGE_HEADER_V3_SIZE;

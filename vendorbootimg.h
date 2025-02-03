@@ -24,6 +24,7 @@ struct VendorBootArgs {
   std::filesystem::path bootconfig;
   std::filesystem::path vendor_ramdisk;
   std::string vendor_cmdline;
+  std::string board;
   std::vector<VendorRamdiskEntry> ramdisks;
   uint32_t base = 0x10000000;
   uint32_t kernel_offset = 0x00008000;

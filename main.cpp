@@ -227,6 +227,7 @@ ParseArguments(int argc, char *argv[]) {
         return std::nullopt;
       }
       args.board = argv[i];
+      vendor_args.board = args.board;
     } else if (arg == "--pagesize") {
       if (++i >= argc) {
         std::cerr << "--pagesize requires an argument\n";
