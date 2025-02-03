@@ -75,7 +75,7 @@ void print_help() {
          "vendor_boot and 4 for boot)\n"
          "  -o, --out, --output, --boot BOOT\n"
          "                        output file name\n"
-         "  --vendor_boot VENDOR_BOOT   output file name\n"
+         "  --vendor_boot VENDOR_BOOT\n"
          "                        vendor boot output file name\n"
          "  --vendor_ramdisk VENDOR_RAMDISK\n"
          "                        path to the vendor ramdisk\n"
