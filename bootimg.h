@@ -25,7 +25,7 @@ struct BootImageArgs {
   uint32_t tags_offset = 0x00000100;
   std::string board;
   uint32_t page_size = 2048;
-  uint32_t header_version = 0;
+  uint32_t header_version = 4;
   std::filesystem::path output;
   bool print_id = false;
 };
