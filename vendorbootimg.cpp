@@ -4,9 +4,12 @@
 
 namespace {
 constexpr std::string_view VENDOR_BOOT_MAGIC = "VNDRBOOT";
-constexpr size_t VENDOR_BOOT_MAGIC_SIZE = 8;
-constexpr size_t VENDOR_RAMDISK_NAME_SIZE = 32;
-constexpr size_t VENDOR_RAMDISK_TABLE_ENTRY_V4_SIZE = 108;
+constexpr uint32_t VENDOR_BOOT_MAGIC_SIZE = 8;
+constexpr uint32_t VENDOR_RAMDISK_NAME_SIZE = 32;
+constexpr uint32_t VENDOR_RAMDISK_TABLE_ENTRY_V4_SIZE = 108;
+constexpr uint32_t VENDOR_BOOT_IMAGE_HEADER_V3_SIZE = 2112;
+constexpr uint32_t VENDOR_BOOT_IMAGE_HEADER_V4_SIZE = 2128;
+constexpr uint32_t VENDOR_BOOT_ARGS_SIZE = 2048;
 } // namespace
 
 bool VendorBootBuilder::Build() {
@@ -121,7 +124,7 @@ bool VendorBootBuilder::WriteTableEntries(std::ostream &out) {
 
     std::vector<char> name(VENDOR_RAMDISK_NAME_SIZE, 0);
     std::copy_n(entry.name.begin(),
-                std::min(entry.name.size(), VENDOR_RAMDISK_NAME_SIZE - 1),
+                std::min(entry.name.size(), static_cast<size_t>(VENDOR_RAMDISK_NAME_SIZE - 1)),
                 name.begin());
     out.write(name.data(), name.size());
 

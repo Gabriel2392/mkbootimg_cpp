@@ -10,9 +10,6 @@ constexpr uint32_t VENDOR_RAMDISK_TYPE_NONE = 0;
 constexpr uint32_t VENDOR_RAMDISK_TYPE_PLATFORM = 1;
 constexpr uint32_t VENDOR_RAMDISK_TYPE_RECOVERY = 2;
 constexpr uint32_t VENDOR_RAMDISK_TYPE_DLKM = 3;
-constexpr uint32_t VENDOR_BOOT_IMAGE_HEADER_V3_SIZE = 2112;
-constexpr uint32_t VENDOR_BOOT_IMAGE_HEADER_V4_SIZE = 2128;
-constexpr uint32_t VENDOR_BOOT_ARGS_SIZE = 2048;
 
 struct VendorRamdiskEntry {
   std::filesystem::path path;
