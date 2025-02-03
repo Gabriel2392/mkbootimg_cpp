@@ -66,7 +66,8 @@ bool VendorBootBuilder::WriteHeader(std::ostream &out) {
   utils::WriteU32(out, args.base + args.ramdisk_offset);
   utils::WriteU32(out, static_cast<uint32_t>(ramdisk_total_size));
 
-  std::vector<char> cmdline(2048, 0);
+  std::vector<char> cmdline(args.vendor_cmdline.begin(), args.vendor_cmdline.end());
+  cmdline.resize(VENDOR_BOOT_ARGS_SIZE, 0);
   out.write(cmdline.data(), cmdline.size());
 
   utils::WriteU32(out, args.base + args.tags_offset);

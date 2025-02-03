@@ -12,6 +12,7 @@ constexpr uint32_t VENDOR_RAMDISK_TYPE_RECOVERY = 2;
 constexpr uint32_t VENDOR_RAMDISK_TYPE_DLKM = 3;
 constexpr uint32_t VENDOR_BOOT_IMAGE_HEADER_V3_SIZE = 2112;
 constexpr uint32_t VENDOR_BOOT_IMAGE_HEADER_V4_SIZE = 2128;
+constexpr uint32_t VENDOR_BOOT_ARGS_SIZE = 2048;
 
 struct VendorRamdiskEntry {
   std::filesystem::path path;
@@ -25,6 +26,7 @@ struct VendorBootArgs {
   std::filesystem::path dtb;
   std::filesystem::path bootconfig;
   std::filesystem::path vendor_ramdisk;
+  std::string vendor_cmdline;
   std::vector<VendorRamdiskEntry> ramdisks;
   uint32_t base = 0x10000000;
   uint32_t kernel_offset = 0x00008000;

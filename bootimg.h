@@ -15,7 +15,6 @@ struct BootImageArgs {
   std::filesystem::path dtb;
   std::filesystem::path recovery_dtbo;
   std::string cmdline;
-  std::string vendor_cmdline;
   uint32_t base = 0x10000000;
   uint32_t kernel_offset = 0x00008000;
   uint32_t ramdisk_offset = 0x01000000;

@@ -119,6 +119,13 @@ ParseArguments(int argc, char *argv[]) {
         return std::nullopt;
       }
       vendor_args.bootconfig = argv[i];
+    } else if (arg == "--vendor_cmdline") {
+      parsing_vendor = true;
+      if (++i >= argc) {
+        std::cerr << "--vendor_cmdline requires an argument\n";
+        return std::nullopt;
+      }
+      vendor_args.vendor_cmdline = argv[i];
     } else if (arg == "--vendor_ramdisk") {
       parsing_vendor = true;
       if (++i >= argc) {
