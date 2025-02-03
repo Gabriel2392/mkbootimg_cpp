@@ -8,18 +8,18 @@
 #include <regex>
 
 namespace {
-constexpr size_t BOOT_MAGIC_SIZE = 8;
+constexpr uint32_t BOOT_MAGIC_SIZE = 8;
 constexpr std::string_view BOOT_MAGIC = "ANDROID!";
 constexpr uint32_t BOOT_IMAGE_HEADER_V1_SIZE = 1648;
 constexpr uint32_t BOOT_IMAGE_HEADER_V2_SIZE = 1660;
 constexpr uint32_t BOOT_IMAGE_HEADER_V3_SIZE = 1580;
 constexpr uint32_t BOOT_IMAGE_HEADER_V4_SIZE = 1584;
-constexpr size_t BOOT_NAME_SIZE = 16;
-constexpr size_t BOOT_ARGS_SIZE = 512;
-constexpr size_t BOOT_EXTRA_ARGS_SIZE = 1024;
+constexpr uint32_t BOOT_NAME_SIZE = 16;
+constexpr uint32_t BOOT_ARGS_SIZE = 512;
+constexpr uint32_t BOOT_EXTRA_ARGS_SIZE = 1024;
 
 bool WriteHeaderV3Plus(std::ostream &out, const BootImageArgs &args) {
-  const size_t header_size = args.header_version > 3
+  const uint32_t header_size = args.header_version > 3
                                  ? BOOT_IMAGE_HEADER_V4_SIZE
                                  : BOOT_IMAGE_HEADER_V3_SIZE;
 
@@ -80,12 +80,12 @@ bool WriteLegacyHeader(std::ostream &out, const BootImageArgs &args) {
 
   std::vector<char> board(BOOT_NAME_SIZE, 0);
   std::copy_n(args.board.begin(),
-              std::min(args.board.size(), BOOT_NAME_SIZE - 1), board.begin());
+              std::min(args.board.size(), static_cast<size_t>(BOOT_NAME_SIZE - 1)), board.begin());
   out.write(board.data(), board.size());
 
   std::vector<char> cmdline(BOOT_ARGS_SIZE, 0);
   std::copy_n(args.cmdline.begin(),
-              std::min(args.cmdline.size(), BOOT_ARGS_SIZE - 1),
+              std::min(args.cmdline.size(), static_cast<size_t>(BOOT_ARGS_SIZE - 1)),
               cmdline.begin());
   out.write(cmdline.data(), cmdline.size());
 

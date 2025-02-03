@@ -36,7 +36,7 @@ struct VendorBootArgs {
 
 class VendorBootBuilder {
   VendorBootArgs args;
-  size_t ramdisk_total_size = 0;
+  uint64_t ramdisk_total_size = 0;
 
 public:
   explicit VendorBootBuilder(VendorBootArgs &&args) : args(std::move(args)) {}
