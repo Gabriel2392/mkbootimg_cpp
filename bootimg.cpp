@@ -77,8 +77,12 @@ bool WriteLegacyHeader(std::ostream &out, const BootImageArgs &args) {
   utils::WriteU32(out, args.base + args.tags_offset);
   utils::WriteU32(out, args.page_size);
   utils::WriteU32(out, args.header_version);
-  utils::WriteU32(out, (args.os_version.version << 11) |
-                           args.os_version.patch_level);
+
+  utils::OSVersion os_version = args.os_version;
+  utils::OSVersion::Parse(os_version);
+
+  utils::WriteU32(out, (os_version.version << 11) |
+                           os_version.patch_level);
 
   std::vector<char> board(BOOT_NAME_SIZE, 0);
   std::copy_n(
@@ -195,13 +199,10 @@ bool WriteBootImage(const BootImageArgs &args) {
   auto write_section = [&](const auto &path) {
     if (!path.empty()) {
       auto file = utils::OpenFile(path);
-      if (file) {
-        auto data = utils::ReadFileContents(*file);
-        out.write(reinterpret_cast<const char *>(data.data()), data.size());
-        utils::PadFile(out, args.page_size);
-        return true;
-      }
-      return false;
+      if (!file) return false;
+      auto data = utils::ReadFileContents(*file);
+      out.write(reinterpret_cast<const char *>(data.data()), data.size());
+      utils::PadFile(out, args.page_size);
     }
     return true;
   };
