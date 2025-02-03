@@ -333,6 +333,11 @@ ParseArguments(int argc, char *argv[]) {
     }
   }
 
+  if (vendor_args.output.empty() && args.output.empty()) {
+    std::cerr << "Either --boot or --vendor_boot is required.\n";
+    return std::nullopt;
+  }
+
   if (currentFlags.has_type || currentFlags.has_name ||
       currentFlags.has_fragment) {
     if (!finishCurrentEntry()) {
