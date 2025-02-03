@@ -17,6 +17,7 @@ constexpr uint32_t BOOT_IMAGE_HEADER_V4_SIZE = 1584;
 constexpr uint32_t BOOT_NAME_SIZE = 16;
 constexpr uint32_t BOOT_ARGS_SIZE = 512;
 constexpr uint32_t BOOT_EXTRA_ARGS_SIZE = 1024;
+constexpr uint32_t BOOT_IMAGE_HEADER_V3_PAGESIZE = 4096;
 
 bool WriteHeaderV3Plus(std::ostream &out, const BootImageArgs &args) {
   const uint32_t header_size = args.header_version > 3
@@ -49,7 +50,7 @@ bool WriteHeaderV3Plus(std::ostream &out, const BootImageArgs &args) {
     utils::WriteU32(out, 0); // boot_signature_size
   }
 
-  utils::PadFile(out, 4096);
+  utils::PadFile(out, BOOT_IMAGE_HEADER_V3_PAGESIZE);
   return true;
 }
 
