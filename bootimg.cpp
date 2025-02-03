@@ -20,8 +20,8 @@ constexpr uint32_t BOOT_EXTRA_ARGS_SIZE = 1024;
 
 bool WriteHeaderV3Plus(std::ostream &out, const BootImageArgs &args) {
   const uint32_t header_size = args.header_version > 3
-                                 ? BOOT_IMAGE_HEADER_V4_SIZE
-                                 : BOOT_IMAGE_HEADER_V3_SIZE;
+                                   ? BOOT_IMAGE_HEADER_V4_SIZE
+                                   : BOOT_IMAGE_HEADER_V3_SIZE;
 
   out.write(BOOT_MAGIC.data(), BOOT_MAGIC_SIZE);
   auto kernel = utils::OpenFile(args.kernel);
@@ -30,8 +30,10 @@ bool WriteHeaderV3Plus(std::ostream &out, const BootImageArgs &args) {
   utils::WriteU32(out, utils::GetFileSize(kernel));
   utils::WriteU32(out, utils::GetFileSize(ramdisk));
 
-  utils::WriteU32(out, (args.os_version.version << 11) |
-                           args.os_version.patch_level);
+  utils::OSVersion os_version = args.os_version;
+  utils::OSVersion::Parse(os_version);
+
+  utils::WriteU32(out, (os_version.version << 11) | os_version.patch_level);
   utils::WriteU32(out, header_size);
   utils::WriteU32(out, 0); // reserved
   utils::WriteU32(out, 0);
@@ -79,14 +81,17 @@ bool WriteLegacyHeader(std::ostream &out, const BootImageArgs &args) {
                            args.os_version.patch_level);
 
   std::vector<char> board(BOOT_NAME_SIZE, 0);
-  std::copy_n(args.board.begin(),
-              std::min(args.board.size(), static_cast<size_t>(BOOT_NAME_SIZE - 1)), board.begin());
+  std::copy_n(
+      args.board.begin(),
+      std::min(args.board.size(), static_cast<size_t>(BOOT_NAME_SIZE - 1)),
+      board.begin());
   out.write(board.data(), board.size());
 
   std::vector<char> cmdline(BOOT_ARGS_SIZE, 0);
-  std::copy_n(args.cmdline.begin(),
-              std::min(args.cmdline.size(), static_cast<size_t>(BOOT_ARGS_SIZE - 1)),
-              cmdline.begin());
+  std::copy_n(
+      args.cmdline.begin(),
+      std::min(args.cmdline.size(), static_cast<size_t>(BOOT_ARGS_SIZE - 1)),
+      cmdline.begin());
   out.write(cmdline.data(), cmdline.size());
 
   sha1::SHA1 sha;

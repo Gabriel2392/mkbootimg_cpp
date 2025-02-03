@@ -86,22 +86,47 @@ AsciizString::operator()(const std::string &s) const {
   return result;
 }
 
-std::optional<OSVersion> OSVersion::Parse(const std::string &s) {
+uint32_t ParseOSPatchLevel(const std::string &s) {
+  std::regex patch_re(R"(^(\d{4})-(\d{2})(?:-(\d{2}))?)");
+  std::smatch match;
+  if (std::regex_search(s, match, patch_re)) {
+    try {
+      int year = std::stoi(match[1]);
+      int month = std::stoi(match[2]);
+
+      int y = year - 2000;
+      if (y < 0 || y >= 128) {
+        return 0;
+      }
+
+      int m = month;
+      if (m < 1 || m > 12) {
+        return 0;
+      }
+
+      return (static_cast<uint32_t>(y) << 4) | static_cast<uint32_t>(m);
+    } catch (...) {
+    }
+  }
+  return 0;
+}
+
+void OSVersion::Parse(OSVersion &version) {
   std::regex version_re(R"((\d{1,3})(?:\.(\d{1,3})(?:\.(\d{1,3}))?)?)");
   std::smatch match;
-  if (std::regex_search(s, match, version_re)) {
+  version.version = 0;
+  version.patch_level = ParseOSPatchLevel(version.patch_level_str);
+  if (std::regex_search(version.version_str, match, version_re)) {
     try {
       uint32_t a = std::stoi(match[1]);
       uint32_t b = match[2].matched ? std::stoi(match[2]) : 0;
       uint32_t c = match[3].matched ? std::stoi(match[3]) : 0;
 
-      if (a >= 128 || b >= 128 || c >= 128)
-        return std::nullopt;
-      return OSVersion{(a << 14) | (b << 7) | c, 0};
+      if (a < 128 && b < 128 && c < 128)
+        version.version = (a << 14) | (b << 7) | c;
     } catch (...) {
     }
   }
-  return std::nullopt;
 }
 
 } // namespace utils

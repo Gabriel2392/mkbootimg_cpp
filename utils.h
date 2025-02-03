@@ -50,7 +50,9 @@ public:
 struct OSVersion {
   uint32_t version = 0;
   uint32_t patch_level = 0;
-  static std::optional<OSVersion> Parse(const std::string &s);
+  std::string version_str = "";
+  std::string patch_level_str = "";
+  static void Parse(OSVersion &version);
 };
 
 } // namespace utils

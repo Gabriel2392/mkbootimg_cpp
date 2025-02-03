@@ -71,7 +71,8 @@ void print_help() {
          "  --pagesize {2048,4096,8192,16384}\n"
          "                        page size (default is 2048)\n"
          "  --header_version HEADER_VERSION\n"
-         "                        boot image header version (default is 3 for vendor_boot and 4 for boot)\n"
+         "                        boot image header version (default is 3 for "
+         "vendor_boot and 4 for boot)\n"
          "  -o, --out, --output, --boot BOOT\n"
          "                        output file name\n"
          "  --vendor_boot VENDOR_BOOT   output file name\n"
@@ -276,12 +277,13 @@ ParseArguments(int argc, char *argv[]) {
         std::cerr << "--os_version requires an argument\n";
         return std::nullopt;
       }
-      if (auto ver = utils::OSVersion::Parse(argv[i])) {
-        args.os_version = *ver;
-      } else {
-        std::cerr << "Invalid os_version format\n";
+      args.os_version.version_str = argv[i];
+    } else if (arg == "--os_patch_level") {
+      if (++i >= argc) {
+        std::cerr << "--os_patch_level requires an argument\n";
         return std::nullopt;
       }
+      args.os_version.patch_level_str = argv[i];
     } else if (arg == "--tags_offset") {
       if (++i >= argc) {
         std::cerr << "--tags_offset requires an argument\n";
@@ -301,7 +303,9 @@ ParseArguments(int argc, char *argv[]) {
         return std::nullopt;
       }
       args.page_size = std::strtoul(argv[i], nullptr, 0);
-      bool isPageSizeValid = args.page_size >= 2048 && (args.page_size & (args.page_size - 1)) == 0 && args.page_size <= 16384;
+      bool isPageSizeValid = args.page_size >= 2048 &&
+                             (args.page_size & (args.page_size - 1)) == 0 &&
+                             args.page_size <= 16384;
       if (!isPageSizeValid) {
         std::cerr << "Invalid page size: " << args.page_size << "\n";
         return std::nullopt;
