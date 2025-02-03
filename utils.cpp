@@ -7,11 +7,11 @@
 namespace utils {
 
 void WriteS32(std::ostream &stream, const std::string &value) {
-    std::array<char, 32> bytes{}; 
+  std::array<char, 32> bytes{};
 
-    size_t len = std::min(value.size(), static_cast<size_t>(32));
-    std::copy_n(value.data(), len, bytes.data());
-    stream.write(bytes.data(), bytes.size());
+  size_t len = std::min(value.size(), static_cast<size_t>(32));
+  std::copy_n(value.data(), len, bytes.data());
+  stream.write(bytes.data(), bytes.size());
 }
 
 void WriteU32(std::ostream &stream, uint32_t value) {
@@ -56,15 +56,16 @@ std::vector<uint8_t> ReadFileContents(FileWrapper &file) {
 }
 
 size_t GetFileSize(FileWrapper &file) { return file.size; }
-size_t GetFileSize(std::optional<FileWrapper>& file) {
-  if (file) return GetFileSize(*file);
+size_t GetFileSize(std::optional<FileWrapper> &file) {
+  if (file)
+    return GetFileSize(*file);
   return 0;
 }
 
-size_t GetFileSize(const std::filesystem::path& path) {
-    std::error_code ec;
-    auto size = std::filesystem::file_size(path, ec);
-    return ec ? 0 : size;
+size_t GetFileSize(const std::filesystem::path &path) {
+  std::error_code ec;
+  auto size = std::filesystem::file_size(path, ec);
+  return ec ? 0 : size;
 }
 
 void PadFile(std::ostream &out, size_t padding) {
