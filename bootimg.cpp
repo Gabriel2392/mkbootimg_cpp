@@ -1,11 +1,6 @@
 #include "bootimg.h"
 #include "TinySHA1.hpp"
-#include "utils.h"
-#include <array>
-#include <format>
-#include <fstream>
-#include <iostream>
-#include <regex>
+#include "utils.hpp"
 
 namespace {
 constexpr uint32_t BOOT_MAGIC_SIZE = 8;
@@ -51,7 +46,7 @@ bool WriteHeaderV3Plus(std::ostream &out, const BootImageArgs &args) {
   }
 
   utils::PadFile(out, BOOT_IMAGE_HEADER_V3_PAGESIZE);
-  return true;
+  return out.good();
 }
 
 bool WriteLegacyHeader(std::ostream &out, const BootImageArgs &args) {
@@ -179,21 +174,21 @@ bool WriteLegacyHeader(std::ostream &out, const BootImageArgs &args) {
   }
 
   utils::PadFile(out, args.page_size);
-  return true;
+  return out.good();
 }
 } // namespace
 
-bool WriteBootImage(const BootImageArgs &args) {
+void WriteBootImage(const BootImageArgs &args) {
   std::ofstream out(args.output, std::ios::binary);
   if (!out)
-    return false;
+    throw std::runtime_error("Could not open output file.");
 
   if (args.header_version >= 3) {
-    if (!WriteHeaderV3Plus(out, args))
-      return false;
+      if (!WriteHeaderV3Plus(out, args))
+        throw errors::FileWriteError("header");
   } else {
     if (!WriteLegacyHeader(out, args))
-      return false;
+      throw errors::FileWriteError("header");
   }
 
   // Write kernel/ramdisk/second data
@@ -209,21 +204,19 @@ bool WriteBootImage(const BootImageArgs &args) {
   };
 
   if (!write_section(args.kernel))
-    return false;
+    throw errors::FileWriteError("kernel");
   if (!write_section(args.ramdisk))
-    return false;
+    throw errors::FileWriteError("ramdisk");
   if (!write_section(args.second))
-    return false;
+    throw errors::FileWriteError("second");
 
   if (args.header_version > 0 && args.header_version < 3) {
     if (!write_section(args.recovery_dtbo))
-      return false;
+     throw errors::FileWriteError("recovery_dtbo");
   }
 
   if (args.header_version == 2) {
-    if (!write_section(args.dtb))
-      return false;
+      if (!write_section(args.dtb))
+        throw errors::FileWriteError("dtb");
   }
-
-  return true;
 }

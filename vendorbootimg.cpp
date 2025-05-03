@@ -1,6 +1,4 @@
 #include "vendorbootimg.h"
-#include <fstream>
-#include <iostream>
 
 namespace {
 constexpr std::string_view VENDOR_BOOT_MAGIC = "VNDRBOOT";
@@ -13,17 +11,16 @@ constexpr uint32_t VENDOR_BOOT_ARGS_SIZE = 2048;
 constexpr uint32_t VENDOR_BOOT_NAME_SIZE = 16;
 } // namespace
 
-bool VendorBootBuilder::Build() {
+void VendorBootBuilder::Build() {
   std::ofstream out(args.output, std::ios::binary);
   if (!out) {
-    std::cerr << "Failed to open vendor boot output: " << args.output << "\n";
-    return false;
+    throw std::runtime_error("Could not open output file.");
   }
 
   if (args.header_version > 3 && !args.vendor_ramdisk.empty()) {
     VendorRamdiskEntry MainEntry;
     MainEntry.name = "";
-    MainEntry.type = VENDOR_RAMDISK_TYPE_PLATFORM;
+    MainEntry.type = 1; // type: platform
     MainEntry.path = args.vendor_ramdisk;
     args.vendor_ramdisk.clear();
     args.ramdisks.insert(args.ramdisks.begin(), MainEntry);
@@ -38,9 +35,9 @@ bool VendorBootBuilder::Build() {
   }
 
   if (!WriteHeader(out))
-    return false;
+    throw errors::FileWriteError("header");
   if (!WriteRamdisks(out))
-    return false;
+    throw errors::FileWriteError("ramdisk table");
 
   if (auto dtb = utils::OpenFile(args.dtb)) {
     auto data = utils::ReadFileContents(*dtb);
@@ -50,7 +47,7 @@ bool VendorBootBuilder::Build() {
 
   if (args.header_version > 3) {
     if (!WriteTableEntries(out))
-      return false;
+      throw errors::FileWriteError("ramdisk table entries");
 
     if (auto bc = utils::OpenFile(args.bootconfig)) {
       auto data = utils::ReadFileContents(*bc);
@@ -58,8 +55,6 @@ bool VendorBootBuilder::Build() {
       utils::PadFile(out, args.page_size);
     }
   }
-
-  return true;
 }
 
 bool VendorBootBuilder::WriteHeader(std::ostream &out) {
@@ -95,7 +90,7 @@ bool VendorBootBuilder::WriteHeader(std::ostream &out) {
   }
 
   utils::PadFile(out, args.page_size);
-  return true;
+  return out.good();
 }
 
 bool VendorBootBuilder::WriteRamdisks(std::ostream &out) {
@@ -113,7 +108,7 @@ bool VendorBootBuilder::WriteRamdisks(std::ostream &out) {
     }
   }
   utils::PadFile(out, args.page_size);
-  return true;
+  return out.good();
 }
 
 bool VendorBootBuilder::WriteTableEntries(std::ostream &out) {
@@ -137,5 +132,5 @@ bool VendorBootBuilder::WriteTableEntries(std::ostream &out) {
     offset += size;
   }
   utils::PadFile(out, args.page_size);
-  return true;
+  return out.good();
 }

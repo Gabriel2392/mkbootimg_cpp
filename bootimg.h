@@ -1,12 +1,6 @@
 #pragma once
 
-#include "utils.h"
-#include <cstdint>
-#include <filesystem>
-#include <optional>
-#include <ostream>
-#include <string>
-#include <vector>
+#include "utils.hpp"
 
 struct BootImageArgs {
   std::filesystem::path kernel;
@@ -30,4 +24,4 @@ struct BootImageArgs {
 };
 
 // std::optional<BootImageArgs> ParseArguments(int argc, char* argv[]);
-bool WriteBootImage(const BootImageArgs &args);
+void WriteBootImage(const BootImageArgs &args);

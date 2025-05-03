@@ -1,15 +1,6 @@
 #pragma once
 
-#include "utils.h"
-#include <cstdint>
-#include <filesystem>
-#include <unordered_set>
-#include <vector>
-
-constexpr uint32_t VENDOR_RAMDISK_TYPE_NONE = 0;
-constexpr uint32_t VENDOR_RAMDISK_TYPE_PLATFORM = 1;
-constexpr uint32_t VENDOR_RAMDISK_TYPE_RECOVERY = 2;
-constexpr uint32_t VENDOR_RAMDISK_TYPE_DLKM = 3;
+#include "utils.hpp"
 
 struct VendorRamdiskEntry {
   std::filesystem::path path;
@@ -41,7 +32,7 @@ class VendorBootBuilder {
 
 public:
   explicit VendorBootBuilder(VendorBootArgs &&args) : args(std::move(args)) {}
-  bool Build();
+  void Build();
 
 private:
   bool WriteHeader(std::ostream &out);
