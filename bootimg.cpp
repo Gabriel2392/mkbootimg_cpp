@@ -191,6 +191,8 @@ void WriteBootImage(const BootImageArgs &args) {
       throw errors::FileWriteError("header");
   }
 
+  const size_t data_padding_size = (args.header_version >= 3) ? BOOT_IMAGE_HEADER_V3_PAGESIZE : args.page_size;
+
   // Write kernel/ramdisk/second data
   auto write_section = [&](const auto &path) {
     if (!path.empty()) {
@@ -198,7 +200,7 @@ void WriteBootImage(const BootImageArgs &args) {
       if (!file) return false;
       auto data = utils::ReadFileContents(*file);
       out.write(reinterpret_cast<const char *>(data.data()), data.size());
-      utils::PadFile(out, args.page_size);
+      utils::PadFile(out, data_padding_size);
     }
     return true;
   };
