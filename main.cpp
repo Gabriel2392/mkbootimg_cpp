@@ -378,11 +378,9 @@ vendor boot version 4 arguments:
             }
         }
 
-        if (args.header_version == 0) {
-            args.header_version = vendor_args.output.empty() ? 4 : 3;
-        }
-        if (vendor_args.header_version == 0) {
-            vendor_args.header_version = args.header_version;
+        if (vendor_args.header_version < 3 && !vendor_args.output.empty()) {
+            std::cerr << "Vendor Boot requires header version equal or higher than 3." << std::endl;
+            return std::nullopt;
         }
 
         return std::make_pair(std::move(args), std::move(vendor_args));
