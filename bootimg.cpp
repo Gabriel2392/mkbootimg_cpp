@@ -167,7 +167,7 @@ bool WriteLegacyHeader(std::ostream &out, const BootImageArgs &args) {
 
   if (args.header_version > 1) {
     if (utils::GetFileSize(dtb) == 0) {
-      return false;
+      throw std::runtime_error("Header version 2 requires dtb image.");
     }
     utils::WriteU32(out, utils::GetFileSize(dtb));
     utils::WriteU32(out, args.base + args.dtb_offset);
