@@ -20,7 +20,7 @@ struct VendorBootArgs {
   uint32_t base = 0x10000000;
   uint32_t kernel_offset = 0x00008000;
   uint32_t ramdisk_offset = 0x01000000;
-  uint32_t dtb_offset = 0x01f00000;
+  uint64_t dtb_offset = 0x01f00000;
   uint32_t tags_offset = 0x00000100;
   uint32_t page_size = 2048;
   uint32_t header_version = 3;

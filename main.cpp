@@ -293,7 +293,7 @@ vendor boot version 4 arguments:
                 else if (key == "--dtb_offset") {
                     if (value.empty()) { std::cerr << key << " requires a value.\n"; return std::nullopt; }
                     args.dtb_offset = std::stoul(std::string(value), nullptr, 0);
-                    vendor_args.dtb_offset = args.dtb_offset;
+                    vendor_args.dtb_offset = std::stoull(std::string(value), nullptr, 0);
                 }
                 else if (key == "--os_version") {
                     if (value.empty()) { std::cerr << key << " requires a value.\n"; return std::nullopt; }
