@@ -1,0 +1,22 @@
+CXX := aarch64-linux-android30-clang++
+CXXFLAGS := -O3 -ffast-math -Wall -Wextra -std=c++20 --target=aarch64-linux-android30 --sysroot=/home/gabriel/android-ndk-r28b/toolchains/llvm/prebuilt/linux-x86_64/sysroot
+LDFLAGS := -static-libstdc++
+
+SRCS := bootimg.cpp main.cpp vendorbootimg.cpp
+OBJS := $(SRCS:.cpp=.o)
+DEPS := bootimg.h vendorbootimg.h
+
+TARGET := mkbootimg
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -s -o $@ $^
+
+%.o: %.cpp $(DEPS)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+clean:
+	rm -f $(OBJS) $(TARGET)
+
+.PHONY: all clean
