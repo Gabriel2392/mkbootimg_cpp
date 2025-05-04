@@ -306,6 +306,7 @@ vendor boot version 4 arguments:
                 else if (key == "--tags_offset") {
                     if (value.empty()) { std::cerr << key << " requires a value.\n"; return std::nullopt; }
                     args.tags_offset = std::stoul(std::string(value), nullptr, 0);
+                    vendor_args.tags_offset = args.tags_offset;
                 }
                 else if (key == "--board") {
                     if (value.empty()) { std::cerr << key << " requires a value.\n"; return std::nullopt; }
