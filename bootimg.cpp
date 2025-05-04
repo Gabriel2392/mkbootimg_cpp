@@ -87,12 +87,13 @@ bool WriteLegacyHeader(std::ostream &out, const BootImageArgs &args) {
       board.begin());
   out.write(board.data(), board.size());
 
-  std::vector<char> cmdline(BOOT_ARGS_SIZE, 0);
+  std::vector<char> cmdline_buf(BOOT_ARGS_SIZE, 0);
+  size_t cmdline_copy_len = std::min(args.cmdline.length(), static_cast<size_t>(BOOT_ARGS_SIZE - 1));
   std::copy_n(
       args.cmdline.begin(),
-      std::min(args.cmdline.size(), static_cast<size_t>(BOOT_ARGS_SIZE - 1)),
-      cmdline.begin());
-  out.write(cmdline.data(), cmdline.size());
+      cmdline_copy_len,
+      cmdline_buf.begin());
+  out.write(cmdline_buf.data(), cmdline_buf.size());
 
   sha1::SHA1 sha;
   constexpr std::array<uint8_t, 4> zero{0, 0, 0, 0};
@@ -128,17 +129,20 @@ bool WriteLegacyHeader(std::ostream &out, const BootImageArgs &args) {
   uint32_t digest[5];
   sha.getDigest(digest);
   std::string digestStr;
+  digestStr.reserve(20);
   for (size_t i = 0; i < 5; ++i) {
     digestStr.append(utils::UToS(digest[i]));
   }
   utils::WriteS32(out, digestStr);
 
-  std::vector<char> extra_cmdline(BOOT_EXTRA_ARGS_SIZE, 0);
-  if (args.cmdline.size() > BOOT_ARGS_SIZE) {
-    auto start = args.cmdline.begin() + BOOT_ARGS_SIZE;
-    std::copy(start, args.cmdline.end(), extra_cmdline.begin());
+  std::vector<char> extra_cmdline_buf(BOOT_EXTRA_ARGS_SIZE, 0);
+  if (args.cmdline.length() > BOOT_ARGS_SIZE - 1) {
+      auto extra_start = args.cmdline.begin() + (BOOT_ARGS_SIZE - 1);
+      size_t remaining_len = args.cmdline.length() - (BOOT_ARGS_SIZE - 1);
+      size_t extra_copy_len = std::min(remaining_len, static_cast<size_t>(BOOT_EXTRA_ARGS_SIZE));
+      std::copy_n(extra_start, extra_copy_len, extra_cmdline_buf.begin());
   }
-  out.write(extra_cmdline.data(), extra_cmdline.size());
+  out.write(extra_cmdline_buf.data(), extra_cmdline_buf.size());
 
   if (args.header_version > 0) {
     utils::WriteU32(out, utils::GetFileSize(recovery_dtbo));
@@ -170,7 +174,7 @@ bool WriteLegacyHeader(std::ostream &out, const BootImageArgs &args) {
       throw std::runtime_error("Header version 2 requires dtb image.");
     }
     utils::WriteU32(out, utils::GetFileSize(dtb));
-    utils::WriteU32(out, args.base + args.dtb_offset);
+    utils::WriteU32(out, static_cast<uint64_t>(args.base) + args.dtb_offset);
   }
 
   utils::PadFile(out, args.page_size);
