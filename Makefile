@@ -1,9 +1,9 @@
 CXX := clang++
-CXXFLAGS := -O3 -ffast-math -Wall -Wextra -std=c++23
+CXXFLAGS := -O3 -ffast-math -Wall -Wextra -std=c++20
 
-SRCS := bootimg.cpp main.cpp utils.cpp vendorbootimg.cpp
+SRCS := bootimg.cpp main.cpp vendorbootimg.cpp
 OBJS := $(SRCS:.cpp=.o)
-DEPS := bootimg.h utils.h vendorbootimg.h
+DEPS := bootimg.h vendorbootimg.h
 
 TARGET := mkbootimg
 
